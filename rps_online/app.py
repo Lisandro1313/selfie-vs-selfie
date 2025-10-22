@@ -2,15 +2,32 @@ from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit, join_room, leave_room, rooms
 import base64
 import io
-import cv2
-import numpy as np
-from PIL import Image
 import time
 import uuid
 from threading import Lock
-from gesture_detector import GestureDetector
 import random
 import os
+
+# Import OpenCV with error handling for deployment
+try:
+    import cv2
+    import numpy as np
+    CV2_AVAILABLE = True
+    print("✅ OpenCV loaded successfully")
+except ImportError as e:
+    print(f"⚠️ OpenCV import error: {e}")
+    CV2_AVAILABLE = False
+    
+from PIL import Image
+
+# Import gesture detector with error handling
+try:
+    from gesture_detector import GestureDetector
+    GESTURE_DETECTOR_AVAILABLE = True
+    print("✅ GestureDetector loaded successfully")
+except ImportError as e:
+    print(f"⚠️ GestureDetector import error: {e}")
+    GESTURE_DETECTOR_AVAILABLE = False
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'rps_online_secret_2025'
@@ -90,7 +107,13 @@ game_rooms = {}
 players = {}
 room_lock = Lock()
 
-gesture_detector = GestureDetector()
+# Initialize gesture detector if available
+if GESTURE_DETECTOR_AVAILABLE and CV2_AVAILABLE:
+    gesture_detector = GestureDetector()
+    print("✅ GestureDetector initialized")
+else:
+    gesture_detector = None
+    print("⚠️ GestureDetector not available, using fallback")
 
 @app.route('/')
 def index():
@@ -279,11 +302,19 @@ def handle_gesture_capture(data):
         image_bytes = base64.b64decode(image_data)
         image = Image.open(io.BytesIO(image_bytes))
         
-        # Convertir a formato OpenCV
-        opencv_image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
-        
-        # Detectar gesto
-        gesture = gesture_detector.detect_rps_gesture(opencv_image)
+        # Detectar gesto con fallback
+        if gesture_detector and CV2_AVAILABLE:
+            try:
+                # Convertir a formato OpenCV
+                opencv_image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+                gesture = gesture_detector.detect_rps_gesture(opencv_image)
+            except Exception as e:
+                print(f"Error en detección de gesto: {e}")
+                gesture = random.choice(['rock', 'paper', 'scissors'])  # Fallback
+        else:
+            # Fallback: gesto aleatorio si no hay detector
+            gesture = random.choice(['rock', 'paper', 'scissors'])
+            print("⚠️ Usando gesto aleatorio (detector no disponible)")
         
         # Guardar captura y gesto
         room.captures[player['id']] = image_data

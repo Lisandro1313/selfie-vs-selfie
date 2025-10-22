@@ -1,7 +1,7 @@
 # 🏖️ Selfie vs Selfie
 
 **Juego multijugador de Piedra, Papel o Tijera con reconocimiento de gestos**  
-*Estética inspirada en Playa del Carmen* 🌊
+_Estética inspirada en Playa del Carmen_ 🌊
 
 ![Demo](https://img.shields.io/badge/Status-Ready_for_Deployment-brightgreen)
 ![Python](https://img.shields.io/badge/Python-3.8+-blue)
@@ -11,7 +11,7 @@
 ## 🎮 Características
 
 - **🤝 Multijugador en tiempo real** - Crea salas y juega contra otros jugadores online
-- **🤖 Modo IA** - Juega contra la inteligencia artificial cuando no hay jugadores disponibles  
+- **🤖 Modo IA** - Juega contra la inteligencia artificial cuando no hay jugadores disponibles
 - **📸 Reconocimiento de gestos** - Usa tu cámara web para detectar piedra, papel o tijera
 - **�️ Estética Playa del Carmen** - Diseño tropical con colores turquesa y arena
 - **⚡ Tiempo real** - Comunicación instantánea con WebSockets
