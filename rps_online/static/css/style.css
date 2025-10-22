@@ -1,0 +1,302 @@
+/* Estilos principales para Selfie vs Selfie - Tema Playa del Carmen */
+
+:root {
+    --primary-color: #4ECDC4;      /* Turquesa suave */
+    --secondary-color: #F7DC6F;     /* Arena dorada */
+    --accent-color: #85C1E9;        /* Celeste cielo */
+    --success-color: #58D68D;       /* Verde tropical */
+    --warning-color: #F8C471;       /* Amarillo cálido */
+    --danger-color: #EC7063;        /* Coral suave */
+    --info-color: #AED6F1;          /* Azul agua */
+    --dark-color: #5D6D7E;          /* Gris piedra */
+    --sand-light: #FEF9E7;          /* Arena clara */
+    --ocean-deep: #2E86C1;          /* Océano profundo */
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, var(--accent-color) 0%, var(--primary-color) 50%, var(--secondary-color) 100%);
+    min-height: 100vh;
+    color: var(--dark-color);
+}
+
+/* Cards */
+.card {
+    border: none;
+    box-shadow: 0 8px 20px rgba(78, 205, 196, 0.15);
+    transition: all 0.3s ease;
+    background: var(--sand-light);
+    border-top: 3px solid var(--primary-color);
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 25px rgba(78, 205, 196, 0.25);
+}
+
+/* Buttons */
+.btn {
+    border-radius: 25px;
+    font-weight: 600;
+    text-transform: none;
+    letter-spacing: 0.3px;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+    border-color: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(45deg, var(--accent-color), var(--primary-color));
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(78, 205, 196, 0.3);
+}
+
+.btn-success {
+    background: linear-gradient(45deg, var(--success-color), var(--primary-color));
+    border-color: var(--success-color);
+}
+
+.btn-success:hover {
+    background: linear-gradient(45deg, var(--primary-color), var(--success-color));
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(88, 214, 141, 0.3);
+}
+
+.btn-lg {
+    padding: 15px 30px;
+    font-size: 1.1rem;
+}
+
+/* Room Cards */
+.room-card {
+    cursor: pointer;
+    transition: all 0.3s;
+    border: 2px solid transparent;
+}
+
+.room-card:hover {
+    border-color: var(--primary-color);
+    background-color: #f8f9fa;
+}
+
+.room-card.full {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Badge Styles */
+.badge {
+    font-size: 0.8rem;
+    padding: 6px 12px;
+    border-radius: 20px;
+}
+
+/* Loading Animations */
+.spinner-border {
+    border-width: 3px;
+}
+
+/* Camera Styles */
+#videoElement {
+    background: #000;
+    border-radius: 12px !important;
+}
+
+/* Countdown Styles */
+#countdownOverlay {
+    z-index: 1000;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(1.05); }
+    100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+/* Result Images */
+.result-image {
+    border-radius: 20px;
+    box-shadow: 0 8px 20px rgba(78, 205, 196, 0.3);
+    border: 3px solid var(--sand-light);
+}
+
+/* Tropical Enhancements */
+.bg-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color)) !important;
+}
+
+.text-primary {
+    color: var(--primary-color) !important;
+}
+
+.badge {
+    font-size: 0.9rem;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+.badge.bg-primary {
+    background: linear-gradient(45deg, var(--primary-color), var(--accent-color)) !important;
+}
+
+.badge.bg-success {
+    background: linear-gradient(45deg, var(--success-color), var(--primary-color)) !important;
+}
+
+/* Room Cards */
+.room-card {
+    background: var(--sand-light);
+    border: 2px solid var(--primary-color);
+    border-radius: 15px;
+    transition: all 0.3s ease;
+}
+
+.room-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(78, 205, 196, 0.2);
+    background: white;
+}
+
+/* Spinner personalizado */
+.spinner-border-primary {
+    color: var(--primary-color);
+    border-width: 3px;
+}
+
+/* Texto con sombra suave */
+.text-shadow {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Status Indicators */
+.status-indicator {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.status-online { background-color: var(--success-color); }
+.status-waiting { background-color: var(--warning-color); }
+.status-offline { background-color: var(--danger-color); }
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .display-4 {
+        font-size: 2.5rem;
+    }
+    
+    #videoElement {
+        width: 100%;
+        max-width: 480px;
+        height: auto;
+    }
+    
+    .btn-lg {
+        font-size: 1rem;
+        padding: 10px 20px;
+    }
+}
+
+@media (max-width: 576px) {
+    .container-fluid {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    #countdownOverlay .rounded-circle {
+        width: 150px !important;
+        height: 150px !important;
+    }
+    
+    #countdownNumber {
+        font-size: 3rem !important;
+    }
+}
+
+/* Game Section Styles */
+.game-area {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    padding: 20px;
+    margin: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Player Status */
+.player-info {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 10px;
+}
+
+/* Gesture Instructions */
+.gesture-hint {
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 25px;
+    display: inline-block;
+    margin-top: 10px;
+}
+
+/* Custom Animations */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.zoom-in {
+    animation: zoomIn 0.3s ease-out;
+}
+
+@keyframes zoomIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* Victory Effects */
+.winner {
+    animation: celebration 2s ease-in-out;
+}
+
+@keyframes celebration {
+    0%, 100% { transform: scale(1); }
+    25% { transform: scale(1.05); }
+    75% { transform: scale(0.95); }
+}
+
+/* Error States */
+.error-state {
+    color: var(--danger-color);
+    background: rgba(220, 53, 69, 0.1);
+    border: 1px solid rgba(220, 53, 69, 0.3);
+    border-radius: 8px;
+    padding: 15px;
+}
+
+/* Success States */
+.success-state {
+    color: var(--success-color);
+    background: rgba(40, 167, 69, 0.1);
+    border: 1px solid rgba(40, 167, 69, 0.3);
+    border-radius: 8px;
+    padding: 15px;
+}
