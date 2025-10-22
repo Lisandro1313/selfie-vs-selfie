@@ -1,13 +1,21 @@
-# Hand Detection & Gesture Recognition
+# 🏖️ Selfie vs Selfie
 
-Un proyecto de detección de manos y reconocimiento de gestos en tiempo real usando OpenCV y MediaPipe.
+**Juego multijugador de Piedra, Papel o Tijera con reconocimiento de gestos**  
+*Estética inspirada en Playa del Carmen* 🌊
 
-## Características
+![Demo](https://img.shields.io/badge/Status-Ready_for_Deployment-brightgreen)
+![Python](https://img.shields.io/badge/Python-3.8+-blue)
+![Flask](https://img.shields.io/badge/Flask-2.3.3-red)
+![License](https://img.shields.io/badge/License-MIT-yellow)
 
-- 🖐️ Detección de manos en tiempo real
-- 📊 Visualización de puntos clave de la mano
-- ✋ Reconocimiento de gestos (contar dedos, piedra-papel-tijeras)
-- 🎮 Controles interactivos
+## 🎮 Características
+
+- **🤝 Multijugador en tiempo real** - Crea salas y juega contra otros jugadores online
+- **🤖 Modo IA** - Juega contra la inteligencia artificial cuando no hay jugadores disponibles  
+- **📸 Reconocimiento de gestos** - Usa tu cámara web para detectar piedra, papel o tijera
+- **�️ Estética Playa del Carmen** - Diseño tropical con colores turquesa y arena
+- **⚡ Tiempo real** - Comunicación instantánea con WebSockets
+- **📱 Responsive** - Funciona en desktop y móvil
 - 📈 Monitoreo de FPS y rendimiento
 
 ## Requisitos
