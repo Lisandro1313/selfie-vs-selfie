@@ -1,6 +1,7 @@
 # 🚀 GUÍA RÁPIDA: Desplegar en Railway
 
 ## ✅ Pre-requisitos Completados
+
 - ✅ Todas las dependencias instaladas
 - ✅ Archivos de configuración listos
 - ✅ App funciona localmente
@@ -9,6 +10,7 @@
 ## 🌐 Pasos para Railway
 
 ### 1. Subir a GitHub
+
 ```bash
 # Si no tienes Git inicializado
 git init
@@ -21,6 +23,7 @@ git push -u origin main
 ```
 
 ### 2. Desplegar en Railway
+
 1. **Ve a** [railway.app](https://railway.app)
 2. **Sign up** con GitHub
 3. **"Deploy from GitHub repo"**
@@ -32,6 +35,7 @@ git push -u origin main
    - Asigna dominio
 
 ### 3. ¡Listo! 🎉
+
 - **URL:** Railway te dará una URL como `https://selfie-vs-selfie-production.up.railway.app`
 - **HTTPS:** Automático
 - **SSL:** Incluido
@@ -40,6 +44,7 @@ git push -u origin main
 ## 🎮 Tu Juego Online
 
 Una vez desplegado, cualquiera puede:
+
 - **Abrir tu URL** desde cualquier dispositivo
 - **Crear salas privadas** para jugar con amigos
 - **Jugar contra IA** inmediatamente
@@ -60,17 +65,20 @@ Una vez desplegado, cualquiera puede:
 ## 🔧 Variables de Entorno (Opcional)
 
 En Railway > Settings > Variables:
+
 ```
 SECRET_KEY=tu_clave_super_secreta_123
 DEBUG=False
 ```
 
 ## 💰 Costos
+
 - **Railway:** Gratis hasta 512MB RAM + $5/mes Pro
 - **Heroku:** Gratis limitado + $7/mes Hobby
 - **Render:** Gratis limitado + $7/mes
 
 ## 🆘 Si hay problemas
+
 1. **Revisar logs** en Railway dashboard
 2. **Verificar** que todos los archivos estén en GitHub
 3. **Contactar** si necesitas ayuda

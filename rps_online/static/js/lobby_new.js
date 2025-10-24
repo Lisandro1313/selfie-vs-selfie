@@ -76,6 +76,25 @@ function setupSocketEvents() {
             window.location.href = `/game/${data.room_id}`;
         }
     });
+
+    socket.on('room_list_updated', function (data) {
+        console.log('📋 Lista de salas actualizada:', data);
+        if (data.available_rooms) {
+            updateRooms(data.available_rooms);
+        }
+    });
+
+    socket.on('joined_room', function (data) {
+        console.log('🚪 Te uniste a la sala:', data);
+        if (data.room_id) {
+            window.location.href = `/game/${data.room_id}`;
+        }
+    });
+
+    socket.on('error', function (data) {
+        console.error('❌ Error del servidor:', data);
+        alert('Error: ' + (data.message || 'Algo salió mal'));
+    });
 }
 
 // Configurar eventos de la UI
@@ -92,31 +111,35 @@ function setupUIEvents() {
         };
     }
 
-    // Event delegation para botones específicos solamente
-    document.addEventListener('click', function (e) {
-        const id = e.target.id;
-        
-        // Solo loggear clicks en botones específicos
-        const buttonIds = ['createRoomBtn', 'playAiBtn', 'logoutBtn', 'refreshBtn'];
-        if (buttonIds.includes(id)) {
-            console.log('🖱️ Click:', id);
-        }
+    // Remover event listeners previos para evitar duplicados
+    document.removeEventListener('click', handleButtonClick);
+    document.addEventListener('click', handleButtonClick);
+}
 
-        switch (id) {
-            case 'createRoomBtn':
-                createRoom();
-                break;
-            case 'playAiBtn':
-                createAiGame();
-                break;
-            case 'logoutBtn':
-                logout();
-                break;
-            case 'refreshBtn':
-                refreshRooms();
-                break;
-        }
-    });
+// Función separada para manejar clicks de botones
+function handleButtonClick(e) {
+    const id = e.target.id;
+
+    // Solo loggear clicks en botones específicos
+    const buttonIds = ['createRoomBtn', 'playAiBtn', 'logoutBtn', 'refreshBtn'];
+    if (buttonIds.includes(id)) {
+        console.log('🖱️ Click:', id);
+    }
+
+    switch (id) {
+        case 'createRoomBtn':
+            createRoom();
+            break;
+        case 'playAiBtn':
+            createAiGame();
+            break;
+        case 'logoutBtn':
+            logout();
+            break;
+        case 'refreshBtn':
+            refreshRooms();
+            break;
+    }
 }
 
 // Funciones principales
