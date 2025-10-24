@@ -206,8 +206,23 @@ def game(room_id):
 def handle_join_lobby(data):
     print(f"Usuario intentando unirse al lobby: {data}")
     username = data['username']
-    player_id = str(uuid.uuid4())
     
+    # Verificar si el usuario ya está conectado
+    if request.sid in players:
+        existing_player = players[request.sid]
+        if existing_player['username'] == username:
+            print(f"Jugador {username} ya conectado, enviando datos existentes")
+            # Enviar datos existentes sin crear nuevo jugador
+            available_rooms = get_available_rooms()
+            emit('lobby_joined', {
+                'player_id': existing_player['id'],
+                'username': username,
+                'available_rooms': available_rooms
+            })
+            return
+    
+    # Crear nuevo jugador si no existe
+    player_id = str(uuid.uuid4())
     players[request.sid] = {
         'id': player_id,
         'username': username,
