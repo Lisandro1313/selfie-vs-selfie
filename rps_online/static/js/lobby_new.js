@@ -28,9 +28,9 @@ function setupSocketEvents() {
         console.log('✅ Socket conectado:', socket.id);
         isConnected = true;
 
-        // Auto-reconectar si hay usuario guardado
+        // Auto-reconectar si hay usuario guardado Y no estamos ya conectados como ese usuario
         const savedUser = localStorage.getItem('rps_username');
-        if (savedUser && !currentUser) {
+        if (savedUser && !currentUser && savedUser !== currentUser) {
             console.log('🔄 Auto-reconectando:', savedUser);
             joinLobby(savedUser);
         }
@@ -92,10 +92,15 @@ function setupUIEvents() {
         };
     }
 
-    // Event delegation para botones
-    document.onclick = function (e) {
+    // Event delegation para botones específicos solamente
+    document.addEventListener('click', function (e) {
         const id = e.target.id;
-        console.log('🖱️ Click:', id);
+        
+        // Solo loggear clicks en botones específicos
+        const buttonIds = ['createRoomBtn', 'playAiBtn', 'logoutBtn', 'refreshBtn'];
+        if (buttonIds.includes(id)) {
+            console.log('🖱️ Click:', id);
+        }
 
         switch (id) {
             case 'createRoomBtn':
@@ -111,13 +116,19 @@ function setupUIEvents() {
                 refreshRooms();
                 break;
         }
-    };
+    });
 }
 
 // Funciones principales
 function joinLobby(username) {
     if (!isConnected || !socket) {
         console.error('❌ Socket no conectado');
+        return;
+    }
+
+    // Evitar envíos duplicados
+    if (currentUser === username) {
+        console.log('⚠️ Ya conectado como:', username);
         return;
     }
 
