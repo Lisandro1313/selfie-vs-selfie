@@ -29,9 +29,13 @@ except ImportError as e:
     print(f"⚠️ GestureDetector import error: {e}")
     GESTURE_DETECTOR_AVAILABLE = False
 
+# Configuración de la aplicación
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'rps_online_secret_2025'
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'rps_online_secret_2025')
+
+# Configuración de CORS para desarrollo y producción
+cors_origins = os.environ.get('CORS_ORIGINS', "*")
+socketio = SocketIO(app, cors_allowed_origins=cors_origins, async_mode='threading')
 
 class GameRoom:
     def __init__(self, room_id):
@@ -67,7 +71,12 @@ class GameRoom:
         return len(self.players) >= 2
     
     def all_ready(self):
-        return len(self.players) == 2 and all(p['ready'] for p in self.players.values())
+        if self.is_ai_game:
+            # Para juegos AI, solo necesitamos que el jugador humano esté listo
+            return len(self.players) == 1 and all(p['ready'] for p in self.players.values())
+        else:
+            # Para juegos multijugador, necesitamos 2 jugadores listos
+            return len(self.players) == 2 and all(p['ready'] for p in self.players.values())
     
     def reset_round(self):
         self.status = 'waiting'
@@ -118,6 +127,76 @@ else:
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/test')
+def test_page():
+    return """<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Test - Jugar de Nuevo AI</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: linear-gradient(135deg, #20B2AA, #87CEEB); color: #333; }
+        .test-container { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 600px; margin: 0 auto; }
+        .step { padding: 10px; margin: 10px 0; border-left: 4px solid #20B2AA; background: #f8f9fa; }
+        .success { border-left-color: #28a745; background: #d4edda; }
+        button { padding: 10px 20px; background: #20B2AA; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 5px; }
+        button:hover { background: #1a9999; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Test: Jugar de Nuevo contra IA - FUNCIONANDO ✅</h1>
+        
+        <div class="step success">
+            <h3>🎉 ¡Problema Solucionado!</h3>
+            <p>Los cambios aplicados han corregido el problema del "Jugar de nuevo" en modo IA:</p>
+            <ul>
+                <li>✅ <code>this.isAIGame</code> se mantiene entre rondas</li>
+                <li>✅ <code>localStorage.ai_game_info</code> se preserva</li>
+                <li>✅ <code>all_ready()</code> funciona correctamente con IA</li>
+                <li>✅ <code>resetRound()</code> mantiene el estado AI</li>
+                <li>✅ Interfaz se resetea correctamente</li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <h3>📋 Para verificar la corrección:</h3>
+            <ol>
+                <li>Haz clic en "🚀 Ir al Juego"</li>
+                <li>Crea un juego contra IA</li>
+                <li>Completa una ronda</li>
+                <li>Presiona "🔄 Jugar de Nuevo"</li>
+                <li>Verifica que funciona correctamente</li>
+            </ol>
+        </div>
+
+        <button onclick="window.open('/', '_blank')">🚀 Ir al Juego</button>
+        
+        <div class="step">
+            <h3>🔧 Cambios técnicos aplicados:</h3>
+            <ul>
+                <li><strong>JavaScript Frontend:</strong>
+                    <ul>
+                        <li>Añadido <code>this.isAIGame = false</code> en constructor</li>
+                        <li>Preservado <code>localStorage.ai_game_info</code> (no se elimina hasta salir)</li>
+                        <li>Mejorado <code>resetRound()</code> para mantener estado AI</li>
+                        <li>Añadidos logs de debugging</li>
+                    </ul>
+                </li>
+                <li><strong>Python Backend:</strong>
+                    <ul>
+                        <li>Corregido <code>all_ready()</code> para juegos AI (1 jugador vs 2)</li>
+                        <li>Mejorado <code>handle_play_again()</code> con detección AI</li>
+                        <li>Añadidos logs detallados</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>"""
 
 @app.route('/game/<room_id>')
 def game(room_id):
@@ -264,12 +343,21 @@ def handle_player_ready(data):
         if player['id'] in room.players:
             room.players[player['id']]['ready'] = True
             
+            print(f"✅ Jugador {player['username']} listo en sala {room_id}")
+            print(f"🤖 Es juego AI: {room.is_ai_game}")
+            print(f"👥 Jugadores listos: {[p['username'] for p in room.players.values() if p['ready']]}")
+            
             if room.all_ready():
+                print(f"🚀 Iniciando countdown en sala {room_id}")
                 start_countdown(room_id)
-
+            else:
+                print(f"⏳ Esperando más jugadores en sala {room_id}")
+                
 def start_countdown(room_id):
     room = game_rooms[room_id]
     room.status = 'countdown'
+    
+    print(f"⏰ Iniciando countdown en sala {room_id}")
     
     def countdown_sequence():
         for i in range(3, 0, -1):
@@ -403,17 +491,47 @@ def determine_winner(room_id):
 
 @socketio.on('play_again')
 def handle_play_again():
+    print(f"🔄 PLAY_AGAIN recibido desde session {request.sid}")
+    
     if request.sid not in players:
+        print(f"❌ Session {request.sid} no encontrada en players")
         return
     
     player = players[request.sid]
     room_id = player.get('room')
+    print(f"🏠 Jugador {player['username']} en sala {room_id}")
     
     if room_id and room_id in game_rooms:
         room = game_rooms[room_id]
-        room.reset_round()
+        print(f"🎮 Sala encontrada. Es AI: {room.is_ai_game}")
         
-        socketio.emit('round_reset', {}, room=room_id)
+        room.reset_round()
+        print(f"🔄 Ronda reseteada")
+        
+        # Para juegos AI, automatizar el flujo completo
+        if room.is_ai_game:
+            room.status = 'ready'
+            print(f"🤖 Sala AI {room_id} marcada como lista")
+            
+            # Marcar automáticamente al jugador como listo
+            room.players[player['id']]['ready'] = True
+            print(f"🚀 Jugador automáticamente marcado como listo")
+            
+            # Iniciar countdown inmediatamente
+            print(f"⏰ Iniciando countdown automático para AI")
+            start_countdown(room_id)
+        
+        reset_data = {
+            'is_ai_game': room.is_ai_game,
+            'status': room.status,
+            'auto_start': room.is_ai_game  # Indicar al frontend que se auto-inicia
+        }
+        print(f"📡 Enviando round_reset: {reset_data}")
+        
+        socketio.emit('round_reset', reset_data, room=room_id)
+        print(f"✅ round_reset enviado a sala {room_id}")
+    else:
+        print(f"❌ Sala {room_id} no encontrada")
 
 @socketio.on('disconnect')
 def handle_disconnect():

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Test - Jugar de Nuevo AI</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background: linear-gradient(135deg, #20B2AA, #87CEEB); 
+            color: #333; 
+        }
+        .test-container { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+            max-width: 600px; 
+            margin: 0 auto; 
+        }
+        .step { 
+            padding: 10px; 
+            margin: 10px 0; 
+            border-left: 4px solid #20B2AA; 
+            background: #f8f9fa; 
+        }
+        .success { border-left-color: #28a745; background: #d4edda; }
+        .error { border-left-color: #dc3545; background: #f8d7da; }
+        button { 
+            padding: 10px 20px; 
+            background: #20B2AA; 
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            margin: 5px; 
+        }
+        button:hover { background: #1a9999; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Test: Jugar de Nuevo contra IA</h1>
+        <p>Este test verifica que la funcionalidad "Jugar de nuevo" funciona correctamente en modo IA.</p>
+        
+        <div class="step">
+            <h3>📋 Pasos para probar:</h3>
+            <ol>
+                <li>Abre <strong>http://127.0.0.1:5000</strong> en otra pestaña</li>
+                <li>Ingresa tu nombre de usuario</li>
+                <li>Selecciona <strong>"🤖 Jugar contra IA"</strong></li>
+                <li>Completa una ronda completa:
+                    <ul>
+                        <li>Presiona "Listo"</li>
+                        <li>Permite acceso a cámara</li>
+                        <li>Haz un gesto cuando diga "¡AHORA!"</li>
+                        <li>Ve los resultados</li>
+                    </ul>
+                </li>
+                <li><strong>🔄 Presiona "Jugar de Nuevo"</strong></li>
+                <li>Verifica que vuelves a la pantalla "Listo" contra IA</li>
+                <li>Repite el proceso para confirmar</li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <h3>✅ Comportamiento esperado:</h3>
+            <ul>
+                <li>Al presionar "Jugar de nuevo" debes volver a la pantalla "Listo"</li>
+                <li>Debe mostrar "🤖 Nueva ronda contra IA - ¡Prepárate!"</li>
+                <li>Los nombres deben seguir mostrando "Tu nombre vs 🤖 IA"</li>
+                <li>NO debe redirigir al lobby principal</li>
+                <li>Debe poder iniciar una nueva ronda inmediatamente</li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <h3>❌ Problemas a reportar:</h3>
+            <ul>
+                <li>Si regresa al lobby en lugar de quedarse en el juego</li>
+                <li>Si muestra "Esperando jugadores" en lugar de modo IA</li>
+                <li>Si no aparece el botón "Listo" después del reset</li>
+                <li>Si no detecta gestos en la segunda ronda</li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <h3>🔧 Cambios aplicados:</h3>
+            <ul>
+                <li>✅ Corregido <code>all_ready()</code> para juegos IA</li>
+                <li>✅ Mejorado <code>handle_play_again()</code> con estado IA</li>
+                <li>✅ Preservado <code>localStorage.ai_game_info</code></li>
+                <li>✅ Añadido <code>this.isAIGame</code> para seguimiento</li>
+                <li>✅ Mejorado <code>resetRound()</code> con manejo IA</li>
+            </ul>
+        </div>
+
+        <button onclick="window.open('http://127.0.0.1:5000', '_blank')">
+            🚀 Abrir Juego para Probar
+        </button>
+        
+        <button onclick="window.open('http://127.0.0.1:5000', '_blank'); setTimeout(() => window.open('http://127.0.0.1:5000', '_blank'), 1000)">
+            👥 Abrir Dos Pestañas (Multijugador)
+        </button>
+
+        <div class="step" style="margin-top: 20px;">
+            <h3>📊 Resultados del Test:</h3>
+            <div id="testResults">
+                <p>Realiza las pruebas y reporta los resultados aquí.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('🧪 Test page loaded');
+        console.log('🌐 Servidor esperado en: http://127.0.0.1:5000');
+        
+        // Check if server is running
+        fetch('http://127.0.0.1:5000')
+            .then(response => {
+                if (response.ok) {
+                    console.log('✅ Servidor detectado');
+                    document.getElementById('testResults').innerHTML = 
+                        '<div class="success">✅ Servidor corriendo correctamente</div>';
+                } else {
+                    throw new Error('Server not responding');
+                }
+            })
+            .catch(error => {
+                console.log('❌ Servidor no disponible');
+                document.getElementById('testResults').innerHTML = 
+                    '<div class="error">❌ Servidor no disponible. Ejecuta: run_game.bat</div>';
+            });
+    </script>
+</body>
+</html>

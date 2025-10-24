@@ -6,6 +6,7 @@ class GameManager {
         this.roomId = window.ROOM_ID;
         this.playerId = null;
         this.gameState = 'waiting'; // waiting, ready, countdown, capturing, results
+        this.isAIGame = false; // Seguimiento del modo AI
 
         this.init();
     }
@@ -65,8 +66,9 @@ class GameManager {
             this.showResults(data);
         });
 
-        this.socket.on('round_reset', () => {
-            this.resetRound();
+        this.socket.on('round_reset', (data) => {
+            console.log('🔄 Round reset recibido:', data);
+            this.resetRound(data);
         });
     }
 
@@ -108,6 +110,7 @@ class GameManager {
                 if (gameData.room_id === this.roomId && gameData.is_ai_game) {
                     // Es un juego AI, activar inmediatamente
                     console.log('🎮 Activando juego AI inmediatamente');
+                    this.isAIGame = true; // Marcar como juego AI
                     setTimeout(() => {
                         this.handleAIRoomReady({
                             player_name: gameData.player_name,
@@ -115,8 +118,8 @@ class GameManager {
                         });
                     }, 500);
 
-                    // Limpiar la información después de usar
-                    localStorage.removeItem('ai_game_info');
+                    // NO eliminar la información - la necesitamos para "play again"
+                    // localStorage.removeItem('ai_game_info');
                     return;
                 }
             } catch (e) {
@@ -512,10 +515,34 @@ class GameManager {
     }
 
     playAgain() {
-        this.socket.emit('play_again');
+        console.log('🔄 Enviando solicitud de play_again...');
+
+        // Para juegos AI, usar lógica local directa
+        if (this.isAIGame || localStorage.getItem('ai_game_info')) {
+            console.log('🤖 Juego AI detectado - Usando reset local inmediato');
+
+            // Reset directo para AI
+            this.gameState = 'ready';
+            document.getElementById('resultsSection').classList.add('d-none');
+            document.getElementById('readySection').classList.remove('d-none');
+            document.getElementById('cameraSection').classList.add('d-none');
+            document.getElementById('countdownOverlay').classList.add('d-none');
+            document.getElementById('gameStatus').textContent = '🤖 Nueva ronda contra IA - ¡Prepárate!';
+
+            // Parar cámara si está funcionando
+            this.camera.stopCamera();
+
+            console.log('✅ Reset local completado para juego AI');
+
+            // También enviar al servidor para mantener sincronización
+            this.socket.emit('play_again');
+        } else {
+            // Juego normal - usar flujo del servidor
+            this.socket.emit('play_again');
+        }
     }
 
-    resetRound() {
+    resetRound(data = {}) {
         // Resetear UI para nueva ronda
         this.gameState = 'ready';
 
@@ -524,14 +551,50 @@ class GameManager {
         document.getElementById('cameraSection').classList.add('d-none');
         document.getElementById('countdownOverlay').classList.add('d-none');
 
-        document.getElementById('gameStatus').textContent = 'Nueva ronda - ¡Prepárense!';
+        // Verificar si es un juego AI (desde localStorage o data)
+        const isAIGame = data.is_ai_game || this.isAIGame || localStorage.getItem('ai_game_info');
+
+        if (isAIGame) {
+            this.isAIGame = true; // Asegurar que se mantiene el estado
+            document.getElementById('gameStatus').textContent = '🤖 Nueva ronda contra IA - ¡Iniciando automáticamente!';
+            console.log('🤖 Configurando nueva ronda AI con auto-inicio');
+
+            // Asegurar que la interfaz está configurada para AI
+            document.getElementById('waitingSection').classList.add('d-none');
+            document.getElementById('gameSection').classList.remove('d-none');
+
+            // Verificar que los nombres están configurados
+            const aiGameInfo = localStorage.getItem('ai_game_info');
+            if (aiGameInfo) {
+                try {
+                    const gameData = JSON.parse(aiGameInfo);
+                    document.getElementById('player1Name').textContent = gameData.player_name;
+                    document.getElementById('player2Name').textContent = gameData.ai_name;
+                } catch (e) {
+                    console.error('Error parseando AI info:', e);
+                }
+            }
+
+            // Para juegos AI, auto-presionar "Listo" después de un breve delay
+            setTimeout(() => {
+                console.log('🚀 Auto-presionando "Listo" para juego AI');
+                this.handleReady();
+            }, 1000); // 1 segundo de delay para que el jugador vea que se reinició
+
+        } else {
+            document.getElementById('gameStatus').textContent = 'Nueva ronda - ¡Prepárense!';
+        }
 
         // Parar cámara
         this.camera.stopCamera();
+
+        console.log('🔄 Ronda reseteada correctamente, isAIGame:', this.isAIGame);
     }
 
     leaveRoom() {
         this.cleanup();
+        // Limpiar información AI solo cuando se abandona la sala
+        localStorage.removeItem('ai_game_info');
         window.location.href = '/';
     }
 

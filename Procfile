@@ -1,1 +1,1 @@
-web: python rps_online/app.py
+web: python server.py

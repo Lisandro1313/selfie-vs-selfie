@@ -1,9 +1,11 @@
-Flask>=2.3.0
-Flask-SocketIO>=5.3.0
-eventlet>=0.33.0
-opencv-python-headless>=4.7.0
-mediapipe>=0.10.0
-numpy>=1.21.0
-Pillow>=9.0.0
-python-socketio>=5.7.0
-python-engineio>=4.6.0
+# Selfie vs Selfie - Dependencias para Railway
+Flask==2.3.3
+Flask-SocketIO==5.3.6
+eventlet==0.33.3
+opencv-python-headless==4.8.1.78
+mediapipe==0.10.7
+numpy==1.24.3
+Pillow==10.0.1
+python-socketio==5.9.0
+python-engineio==4.7.1
+gunicorn==21.2.0
