@@ -35,7 +35,7 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'rps_online_secret_2025'
 
 # Configuración de CORS para desarrollo y producción
 cors_origins = os.environ.get('CORS_ORIGINS', "*")
-socketio = SocketIO(app, cors_allowed_origins=cors_origins, async_mode='threading')
+socketio = SocketIO(app, cors_allowed_origins=cors_origins)
 
 class GameRoom:
     def __init__(self, room_id):
@@ -576,7 +576,8 @@ def get_available_rooms():
     available_rooms = []
     with room_lock:
         for room_id, room in game_rooms.items():
-            if not room.is_full() and room.status != 'empty':
+            # Solo mostrar salas que no estén llenas, no estén vacías, y no sean juegos AI
+            if not room.is_full() and room.status != 'empty' and not room.is_ai_game:
                 available_rooms.append({
                     'id': room_id,
                     'players': len(room.players),
