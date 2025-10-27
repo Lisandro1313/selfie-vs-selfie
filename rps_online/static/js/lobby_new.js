@@ -30,7 +30,7 @@ function setupSocketEvents() {
 
         // Auto-reconectar si hay usuario guardado Y no estamos ya conectados como ese usuario
         const savedUser = localStorage.getItem('rps_username');
-        if (savedUser && !currentUser && savedUser !== currentUser) {
+        if (savedUser && (!currentUser || currentUser !== savedUser)) {
             console.log('🔄 Auto-reconectando:', savedUser);
             joinLobby(savedUser);
         }
@@ -64,8 +64,11 @@ function setupSocketEvents() {
     });
 
     socket.on('ai_game_created', function (data) {
-        console.log('🤖 Juego IA creado:', data);
+        console.log('🤖 Juego IA creado - evento recibido:', data);
+        console.log('🔍 Datos completos:', JSON.stringify(data, null, 2));
+
         if (data.redirect && data.room_id) {
+            console.log('🚀 Navegando a sala IA:', data.room_id);
             // Guardar información del juego AI en localStorage
             localStorage.setItem('ai_game_info', JSON.stringify({
                 room_id: data.room_id,
@@ -73,7 +76,10 @@ function setupSocketEvents() {
                 ai_name: data.ai_name,
                 is_ai_game: true
             }));
+            console.log('💾 Información IA guardada en localStorage');
             window.location.href = `/game/${data.room_id}`;
+        } else {
+            console.error('❌ Datos de respuesta IA incompletos:', data);
         }
     });
 
@@ -119,26 +125,35 @@ function setupUIEvents() {
 // Función separada para manejar clicks de botones
 function handleButtonClick(e) {
     const id = e.target.id;
+    console.log('🖱️ CLICK DETECTADO EN:', id);
 
     // Solo loggear clicks en botones específicos
     const buttonIds = ['createRoomBtn', 'playAiBtn', 'logoutBtn', 'refreshBtn'];
     if (buttonIds.includes(id)) {
-        console.log('🖱️ Click:', id);
+        console.log('🖱️ Click en botón válido:', id);
+        console.log('🔍 Socket conectado?', socket && socket.connected);
+        console.log('🔍 Usuario actual:', currentUser);
     }
 
     switch (id) {
         case 'createRoomBtn':
+            console.log('🏠 EJECUTANDO createRoom()');
             createRoom();
             break;
         case 'playAiBtn':
+            console.log('🤖 EJECUTANDO createAiGame()');
             createAiGame();
             break;
         case 'logoutBtn':
+            console.log('🚪 EJECUTANDO logout()');
             logout();
             break;
         case 'refreshBtn':
+            console.log('🔄 EJECUTANDO refreshRooms()');
             refreshRooms();
             break;
+        default:
+            console.log('❓ Botón no reconocido:', id);
     }
 }
 
@@ -160,23 +175,61 @@ function joinLobby(username) {
 }
 
 function createRoom() {
+    console.log('🏠 === INICIO createRoom() ===');
+
     if (!isConnected || !socket) {
         console.error('❌ Socket no conectado');
+        alert('Error: Socket no conectado');
+        return;
+    }
+
+    if (!socket.connected) {
+        console.error('❌ Socket no está conectado');
+        alert('Error: Socket desconectado');
         return;
     }
 
     console.log('🏠 Creando sala normal');
-    socket.emit('create_room');
+    console.log('🔍 Estado del socket:', socket.connected);
+    console.log('🔍 ID del socket:', socket.id);
+
+    try {
+        socket.emit('create_room');
+        console.log('📤 Evento create_room enviado exitosamente');
+        alert('Evento create_room enviado - revisa consola del servidor');
+    } catch (error) {
+        console.error('❌ Error enviando create_room:', error);
+        alert('Error enviando evento: ' + error.message);
+    }
 }
 
 function createAiGame() {
+    console.log('🤖 === INICIO createAiGame() ===');
+
     if (!isConnected || !socket) {
         console.error('❌ Socket no conectado');
+        alert('Error: Socket no conectado');
+        return;
+    }
+
+    if (!socket.connected) {
+        console.error('❌ Socket no está conectado');
+        alert('Error: Socket desconectado');
         return;
     }
 
     console.log('🤖 Creando juego vs IA');
-    socket.emit('create_ai_game');
+    console.log('🔍 Estado del socket:', socket.connected);
+    console.log('🔍 ID del socket:', socket.id);
+
+    try {
+        socket.emit('create_ai_game');
+        console.log('📤 Evento create_ai_game enviado exitosamente');
+        alert('Evento create_ai_game enviado - revisa consola del servidor');
+    } catch (error) {
+        console.error('❌ Error enviando create_ai_game:', error);
+        alert('Error enviando evento: ' + error.message);
+    }
 }
 
 function logout() {

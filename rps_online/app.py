@@ -244,7 +244,12 @@ def handle_join_lobby(data):
 
 @socketio.on('create_room')
 def handle_create_room():
+    print(f"🏠 HANDLER create_room ejecutado - SID: {request.sid}")
+    print(f"🔍 Players disponibles: {list(players.keys())}")
     if request.sid not in players:
+        print(f"❌ SID {request.sid} no encontrado en players")
+        print(f"❌ El usuario debe reconectarse correctamente")
+        emit('error', {'message': 'Usuario no registrado, recarga la página'})
         return
     
     room_id = f"room_{int(time.time() * 1000) % 10000}"
@@ -271,7 +276,12 @@ def handle_create_room():
 
 @socketio.on('create_ai_game')
 def handle_create_ai_game():
+    print(f"🤖 HANDLER create_ai_game ejecutado - SID: {request.sid}")
+    print(f"🔍 Players disponibles: {list(players.keys())}")
     if request.sid not in players:
+        print(f"❌ SID {request.sid} no encontrado en players")
+        print(f"❌ El usuario debe reconectarse correctamente")
+        emit('error', {'message': 'Usuario no registrado, recarga la página'})
         return
     
     room_id = f"ai_{int(time.time() * 1000) % 10000}"
@@ -294,13 +304,17 @@ def handle_create_ai_game():
             
             print(f"🤖 Creando sala AI {room_id} para jugador {player['username']}")
             
-            emit('ai_game_created', {
+            response_data = {
                 'room_id': room_id,
                 'redirect': True,
                 'is_ai_game': True,
                 'ai_name': '🤖 IA',
                 'player_name': player['username']
-            })
+            }
+            
+            print(f"📤 Enviando ai_game_created: {response_data}")
+            emit('ai_game_created', response_data)
+            print(f"✅ Respuesta ai_game_created enviada al cliente {request.sid}")
 
 @socketio.on('join_room_request')
 def handle_join_room_request(data):
@@ -586,7 +600,10 @@ def get_available_rooms():
     return available_rooms
 
 if __name__ == '__main__':
-    # Configuración para producción
+    # Configuración para desarrollo local y producción
     port = int(os.environ.get('PORT', 5000))
-    debug_mode = os.environ.get('FLASK_ENV', 'production') == 'development'
+    debug_mode = os.environ.get('FLASK_ENV', 'development') == 'development'
+    # Para desarrollo local, usar debug=False para evitar reinicios
+    if port == 5000:
+        debug_mode = False
     socketio.run(app, host='0.0.0.0', port=port, debug=debug_mode)
